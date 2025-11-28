@@ -206,7 +206,7 @@ public static class Asp
     {
         string folder = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-            "PasswordManagerSecure",
+            "---P4sswordManagerSecure",
             username
         );
 
