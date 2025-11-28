@@ -1,6 +1,6 @@
 ﻿namespace Password_Manager;
 
-public class Login
+public static class Login
 {
     public static void EntryMenu()
     {

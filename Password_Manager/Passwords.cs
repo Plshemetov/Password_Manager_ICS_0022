@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Password_Manager;
 
-public class Passwords
+public static class Passwords
 {
     public static void AddPassword(string username)
     {

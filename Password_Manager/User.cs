@@ -2,7 +2,7 @@
 
 
 
-public class User
+public static class User
 { 
     public static string Username { get; set; }
     private static string Password { get; set; }

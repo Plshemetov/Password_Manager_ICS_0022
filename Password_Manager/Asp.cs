@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using System.Security.Cryptography;
 using System.Diagnostics;
 
-public class Asp
+public static class Asp
 {
     public static void SetFolderHidden(string folderPath)
     {
