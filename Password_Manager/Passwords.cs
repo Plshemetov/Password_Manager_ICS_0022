@@ -132,9 +132,13 @@ public static class Passwords
 
                 string filePath = Path.Combine(basePath, "Managed_passwords.txt");
 
+                string backup = Path.Combine(Folders.PasswordManager, username, "Managed_passwords.txt");
+                string backupFile = Path.Combine(backup, "Managed_passwords.txt");
+
                 List<string[]> existingEntries = LoadManagedPasswords(User.Username);
 
                 Directory.CreateDirectory(basePath);
+                Directory.CreateDirectory(backup);
 
                 bool equalEntries = false;
 
@@ -205,6 +209,10 @@ public static class Passwords
                 try
                 {
                     using (StreamWriter writer = new StreamWriter(filePath, append: true))
+                    {
+                        writer.WriteLine(encryptedString);
+                    }
+                    using (StreamWriter writer = new StreamWriter(backupFile, append: true))
                     {
                         writer.WriteLine(encryptedString);
                     }
@@ -343,8 +351,10 @@ public static class Passwords
                     
                     string basePath = Path.Combine(Folders.UsersFolder, username);
                     string filePath = Path.Combine(basePath, "Managed_passwords.txt");
+                    string backup = Path.Combine(Folders.PasswordManager, username, "Managed_passwords.txt");
                     
                     File.WriteAllLines(filePath, emptyList);
+                    File.WriteAllLines(backup, emptyList);
                     
                     Asp.LogManagedPasswordDeletion(User.Username, website);
                     availableChoice.Clear();
@@ -417,8 +427,13 @@ public static class Passwords
                 {
                     string basePath = Path.Combine(Folders.UsersFolder, username);
                     string filePath = Path.Combine(basePath, "Managed_passwords.txt");
+                    
+                    string backup = Path.Combine(Folders.PasswordManager, username, "Managed_passwords.txt");
 
                     if (!File.Exists(filePath))
+                        return;
+                    
+                    if (!File.Exists(backup))
                         return;
 
                     var result = Asp.LoadAesKeyIv(User.Username);
@@ -460,6 +475,7 @@ public static class Passwords
                     }
 
                     File.WriteAllLines(filePath, remainingLines);
+                    File.WriteAllLines(backup, remainingLines);
                     Asp.LogManagedPasswordDeletion(User.Username, website);
                     availableChoice.Clear();
                     Console.WriteLine("Password deleted successfully!");

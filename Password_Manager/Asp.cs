@@ -28,7 +28,7 @@ public static class Asp
         
         username = Regex.Replace(username, @"[^a-zA-Z0-9_]", "");
         
-        password = Regex.Replace(password, @"\s", "");
+        password = Regex.Replace(password, @"[\s:]+", "");
 
         return (username, password);
     }
