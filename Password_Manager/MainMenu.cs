@@ -4,6 +4,7 @@ public static class MainMenu
 {
     public static void MainList()
     {
+        Console.Clear();
         InactivityManager.ResetInactivityTimer();
         List<string[]> loadedPasswords = Passwords.LoadManagedPasswords(User.Username);
         string choice = "";
