@@ -37,6 +37,11 @@ public static class Passwords
                     continue;
                 }
 
+                if (website.Length > 128)
+                {
+                    continue;
+                }
+
                 if (website.Equals("ESC", StringComparison.CurrentCultureIgnoreCase))
                 {
                     Console.WriteLine("Returning to the main menu");
@@ -47,8 +52,12 @@ public static class Passwords
             } while (string.IsNullOrEmpty(website) || website.Any(Char.IsDigit));
 
             Console.WriteLine("Your username on that website (Can be empty): ");
-            
             var websiteUser = Console.ReadLine().Trim();
+
+            if (websiteUser.Length > 128)
+            {
+                continue;
+            }
             if (websiteUser.Equals("ESC", StringComparison.CurrentCultureIgnoreCase))
             {
                 Console.WriteLine("Returning to the main menu");
@@ -65,6 +74,11 @@ public static class Passwords
                 if (string.IsNullOrEmpty(websitePassword))
                 {
                     Console.WriteLine("Password cannot be empty!");
+                    continue;
+                }
+
+                if (websitePassword.Length > 128)
+                {
                     continue;
                 }
 
@@ -229,6 +243,12 @@ public static class Passwords
                     Console.WriteLine("Invalid input. Try again!");
                     continue;
                 }
+
+                if (website.Length > 128)
+                {
+                    continue;
+                }
+                
                 if (website.Equals("ESC", StringComparison.OrdinalIgnoreCase))
                 {
                     Console.WriteLine("Going back to the main menu.");
@@ -264,6 +284,12 @@ public static class Passwords
                 {
                     Console.WriteLine("Invalid input. Try again!");
                 }
+
+                if (password.Length > 128)
+                {
+                    continue;
+                }
+                
                 password = Asp.SanitizeInput(password, "password");
                 
                 foreach (var entry in availableChoice)
@@ -347,6 +373,11 @@ public static class Passwords
                         if (string.IsNullOrEmpty(user))
                         {
                             Console.WriteLine("Invalid input. Try again!");
+                            continue;
+                        }
+
+                        if (user.Length > 128)
+                        {
                             continue;
                         }
 
