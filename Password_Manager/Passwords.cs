@@ -132,7 +132,7 @@ public static class Passwords
 
                 string filePath = Path.Combine(basePath, "Managed_passwords.txt");
 
-                string backup = Path.Combine(Folders.PasswordManager, username, "Managed_passwords.txt");
+                string backup = Path.Combine(Folders.PasswordManager, username);
                 string backupFile = Path.Combine(backup, "Managed_passwords.txt");
 
                 List<string[]> existingEntries = LoadManagedPasswords(User.Username);
