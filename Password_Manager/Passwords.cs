@@ -398,8 +398,7 @@ public static class Passwords
                         }
 
                     } while (!matchUser);
-                
-                
+                    
                     Console.WriteLine("Are you sure you want to delete it? (y/n): ");
                     string userChoice;
                     do
