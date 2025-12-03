@@ -4,7 +4,7 @@ public static class Login
 {
     public static void EntryMenu()
     {
-        string choice = "";
+        string choice;
         string[] validOptions = ["1", "2", "3"];
         do
         {

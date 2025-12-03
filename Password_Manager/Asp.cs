@@ -1,11 +1,11 @@
 ﻿using System.Text;
+// ReSharper disable All
 
 namespace Password_Manager;
 using System;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Security.Cryptography;
-using System.Diagnostics;
 
 public static class Asp
 {
@@ -227,22 +227,20 @@ public static class Asp
     
     public static string EncryptString(string plaintext, byte[] key, byte[] iv)
     {
-        using (Aes aes = Aes.Create())
-        {
-            aes.Key = key;
-            aes.IV = iv;
-            aes.Mode = CipherMode.CBC;
-            aes.Padding = PaddingMode.PKCS7;
+        using Aes aes = Aes.Create();
+        aes.Key = key;
+        aes.IV = iv;
+        aes.Mode = CipherMode.CBC;
+        aes.Padding = PaddingMode.PKCS7;
 
-            using (var encryptor = aes.CreateEncryptor(aes.Key, aes.IV))
-            using (var ms = new MemoryStream())
-            using (var cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
-            using (var sw = new StreamWriter(cs))
-            {
-                sw.Write(plaintext);
-                sw.Close();
-                return Convert.ToBase64String(ms.ToArray());
-            }
+        using (var encryptor = aes.CreateEncryptor(aes.Key, aes.IV))
+        using (var ms = new MemoryStream())
+        using (var cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
+        using (var sw = new StreamWriter(cs))
+        {
+            sw.Write(plaintext);
+            sw.Close();
+            return Convert.ToBase64String(ms.ToArray());
         }
     }
     
