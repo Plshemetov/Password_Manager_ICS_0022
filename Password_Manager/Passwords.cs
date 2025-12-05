@@ -120,7 +120,6 @@ public static class Passwords
                 choice = Console.ReadLine().Trim().ToLower();
                 if (choice == "yes")
                 {
-                    
                     confirm = true;
                     break;
                 } 
@@ -302,14 +301,20 @@ public static class Passwords
                 
                 foreach (var entry in availableChoice)
                 {
-                    if (entry[1].Equals(password) && entry[0].Equals(website) && entry.Length == 2)
+                    if (entry.Length == 2)
                     {
-                        matchCount++;
-                        break;
+                        if (entry[1].Equals(password) && entry[0].Equals(website))
+                        {
+                            matchCount++;
+                            break;
+                        }
                     }
-                    if (entry[2].Equals(password) && entry[0].Equals(website))
+                    if (entry.Length == 3)
                     {
-                        matchCount++;
+                        if (entry[2].Equals(password) && entry[0].Equals(website))
+                        {
+                            matchCount++;
+                        }
                     } 
                 }
 
@@ -343,24 +348,83 @@ public static class Passwords
                         confirm = true;
                         break;
                     }
+
+                    if (userChoice.Equals("n", StringComparison.OrdinalIgnoreCase))
+                    {
+                        break;
+                    }
                 } while (!userChoice.Equals("y", StringComparison.OrdinalIgnoreCase) ||
                          !userChoice.Equals("n", StringComparison.OrdinalIgnoreCase));
-                if (availableChoice.Count == 1)
-                { 
-                    List<string> emptyList = new List<string>();
-                    
-                    string basePath = Path.Combine(Folders.UsersFolder, username);
-                    string filePath = Path.Combine(basePath, "Managed_passwords.txt");
-                    string backup = Path.Combine(Folders.PasswordManager, username, "Managed_passwords.txt");
-                    
-                    File.WriteAllLines(filePath, emptyList);
-                    File.WriteAllLines(backup, emptyList);
-                    
-                    Asp.LogManagedPasswordDeletion(User.Username, website);
-                    availableChoice.Clear();
-                    Console.WriteLine("Password deleted successfully!");
-                    Thread.Sleep(2000);
-                    MainMenu.MainList();
+
+                if (confirm)
+                {
+                    if (availableChoice.Count == 1)
+                    {
+                        List<string> emptyList = new List<string>();
+
+                        string basePath = Path.Combine(Folders.UsersFolder, username);
+                        string filePath = Path.Combine(basePath, "Managed_passwords.txt");
+                        string backup = Path.Combine(Folders.PasswordManager, username, "Managed_passwords.txt");
+
+                        File.WriteAllLines(filePath, emptyList);
+                        File.WriteAllLines(backup, emptyList);
+
+                        Asp.LogManagedPasswordDeletion(User.Username, website);
+                        availableChoice.Clear();
+                        Console.WriteLine("Password deleted successfully!");
+                        Thread.Sleep(2000);
+                        MainMenu.MainList();
+                    }
+                    else
+                    {
+                        string basePath = Path.Combine(Folders.UsersFolder, username);
+                        string filePath = Path.Combine(basePath, "Managed_passwords.txt");
+
+                        string backup = Path.Combine(Folders.PasswordManager, username, "Managed_passwords.txt");
+
+                        if (!File.Exists(filePath))
+                            return;
+
+                        if (!File.Exists(backup))
+                            return;
+
+                        var result = Asp.LoadAesKeyIv(User.Username);
+                        if (!result.success)
+                        {
+                            Console.WriteLine("Something went missing");
+                            Thread.Sleep(2000);
+                            MainMenu.MainList();
+                        }
+
+                        byte[] key = result.key;
+                        byte[] iv = result.iv;
+
+                        List<string> remainingLines = new List<string>();
+
+                        foreach (var rawLine in availableChoice)
+                        {
+                            if ((rawLine.Length == 2 &&
+                                 rawLine[0] == website &&
+                                 rawLine[1] == password) ||
+                                (rawLine.Length == 3 &&
+                                 rawLine[0] == website &&
+                                 rawLine[2] == password))
+                            {
+                                continue;
+                            }
+
+                            string entry = string.Join(":", rawLine);
+                            remainingLines.Add(Asp.EncryptString(entry, key, iv));
+                        }
+
+                        File.WriteAllLines(filePath, remainingLines);
+                        File.WriteAllLines(backup, remainingLines);
+                        Asp.LogManagedPasswordDeletion(User.Username, website);
+                        availableChoice.Clear();
+                        Console.WriteLine("Password deleted successfully!");
+                        Thread.Sleep(2000);
+                        MainMenu.MainList();
+                    }
                 }
             }
             else
@@ -451,27 +515,15 @@ public static class Passwords
 
                     foreach (var rawLine in availableChoice)
                     {
-                        string[] isMatch;
-                        if (string.IsNullOrEmpty(user))
-                        {
-                            isMatch = [website, password];
-                        }
-                        else
-                        {
-                            isMatch = [website, user, password];
-                        }
+                        string[] isMatch = string.IsNullOrEmpty(user)
+                            ? new[] { website, password }
+                            : new[] { website, user, password };
+                        
+                        if (rawLine.SequenceEqual(isMatch))
+                            continue;
 
-                        if (!rawLine.SequenceEqual(isMatch) && isMatch.Length == 2)
-                        {
-                            string entry = $"{website}:{password}";
-                            remainingLines.Add(Asp.EncryptString(entry, key, iv));
-                        }
-
-                        if (!rawLine.SequenceEqual(isMatch) && isMatch.Length == 3)
-                        {
-                            string entry = $"{rawLine[0]}:{rawLine[1]}:{rawLine[2]}";
-                            remainingLines.Add(Asp.EncryptString(entry, key, iv));
-                        }
+                        string entry = string.Join(":", rawLine);
+                        remainingLines.Add(Asp.EncryptString(entry, key, iv));
                     }
 
                     File.WriteAllLines(filePath, remainingLines);

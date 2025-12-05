@@ -192,7 +192,7 @@ public static class Asp
 
         using (Aes aes = Aes.Create())
         {
-            aes.KeySize = 256; // strongest AES
+            aes.KeySize = 256;
 
             byte[] protectedKey = Protect(aes.Key);
             byte[] protectedIv  = Protect(aes.IV);
